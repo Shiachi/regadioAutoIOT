@@ -16,12 +16,12 @@ void loop() {
   float h = dht.readHumidity(); //leer humedad
   float t = dht.readTemperature(); //Leer temperatura en grados celcius
   //muestreo de datos en puerto serial 9600
-  Serial.print("Humedad ");
+  Serial.print("Humedad:"); 
   Serial.print(h);
-  Serial.print(" %t");
-  Serial.print("\t");
-  Serial.print("Temperatura: ");
+  Serial.println(" %t");  
+  //Serial.print("\t"); // Espacio entre letras
+  Serial.print("Temperatura: ");  //"println" Linea de codigo con salto de linea
   Serial.print(t);
   Serial.print(" *C ");
-  Serial.print('\n'); //salto de linea
+  Serial.print('\n'); //Imprimir salto de linea
 }
