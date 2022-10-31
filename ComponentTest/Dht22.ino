@@ -1,4 +1,4 @@
-#include "DHT.h"
+#include "DHT.h"  //Incluir libreria
 
 #define DHTPIN 8     // Pin donde está conectado el sensor
 
@@ -7,7 +7,7 @@
 DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(9600); //Iniciar puerto serial en 9600
   Serial.println("Iniciando...");
   dht.begin();
 }
