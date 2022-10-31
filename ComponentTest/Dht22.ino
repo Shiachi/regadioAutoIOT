@@ -1,4 +1,4 @@
-#include "DHT.h"
+#include "DHT.h"  //Incluir libreria
 
 #define DHTPIN 8     // Pin donde está conectado el sensor
 
