@@ -33,38 +33,42 @@ void loop()
      
     mySerial.readBytesUntil('H', buffer, lonbuffer);
     hum = mySerial.parseFloat();
+
+    //delay(500);
     
-    mySerial.readBytesUntil('CO', buffer, lonbuffer);
+    mySerial.readBytesUntil('C', buffer, lonbuffer);
     MoCa = mySerial.parseInt();
 
-    mySerial.readBytesUntil('ht', buffer, lonbuffer);
+    mySerial.readBytesUntil('E', buffer, lonbuffer);
     humt = mySerial.parseInt();
+
+    
     mostrar = true;
   }
 
   if (mostrar)
   {
      
-     
-    Serial.print("temp: ");
-    Serial.println(tem);
-
-    Serial.print("humedad: ");
-    Serial.println(hum);
-
-    Serial.print("humedad tierra: ");
-    Serial.println(humt);
-
+    Serial.println("Node");
+    Serial.print("Temp: ");
+    Serial.print(tem);
+    Serial.println(" *C ");
+    Serial.print("Humedad: ");
+    Serial.print(hum);
+    Serial.println(" %");
     Serial.print("CO: ");
     Serial.println(MoCa);
+    Serial.print("Humedad de la tierra: ");
+    Serial.println(humt);
+    
+    Serial.print(" \n");
     
     mostrar = false;
-    delay (1000);
+    delay (2000);
   }
   else{
     Serial.println("Error");
-    delay(1000);
+    delay(2000);
 
   }
-  
 }

@@ -15,7 +15,7 @@ int HumPin = A4; //Sensor humedad tierra
 
 DHT dht(DHTPin, DHTTYPE);
 //Declarar variables 
-float h,t, CO, ht;
+float h,t, c, e;
  
 SoftwareSerial Trans(rxPin, txPin);               //Pines para Rx y Tx.
 
@@ -30,44 +30,43 @@ void setup()
 void loop()
 {
   
-    delay(1000);                                  
+    delay(2000);                                  
     h = dht.readHumidity();                      //Leemos humedad y temperatura respectivamente.
     t = dht.readTemperature();
-    ht = analogRead(A4);    //Leer humedad de tierra
-    CO = analogRead(A5);    //leer CO
+    c = analogRead(A5);    //leer CO
+    e = analogRead(A4);    //Leer humedad de tierra
     if (isnan(h) || isnan(t))                         //Si no se lee valor numérico indicamos el fallo y volvemos a 
-                                            //comprobar.
+                                                              //comprobar.
     {
       Serial.println("Failed to read from DHT sensor!");
       return;
     }
-    if (isnan(ht))
+    if (isnan(e))
     {
         Serial.println("Failed to read from Earth sensor!");
       return;
     }
-    if (isnan(CO))
+    if (isnan(c))
     {
         Serial.println("Failed to read from MQ7 sensor!");
       return;
     }
-    
+    Serial.println("Uno");
     Serial.print("Temperatura: ");
     Serial.print(t);
     Serial.println(" *C ");
     Serial.print("Humedad: ");
     Serial.print(h);
     Serial.println(" %");
-    Serial.print("Humedad de la tierra: ");
-    Serial.println(ht);
     Serial.print("CO: ");
-    Serial.println(CO);
+    Serial.println(c);
+    Serial.print("Humedad de la tierra: ");
+    Serial.print(e);
+    Serial.println(" %");
     
-    
-
     Serial.print(" \n");
 
 
 
-    Trans.println('T'+ String(t)+'H'+ String(h)  + 'ht' + String(ht) + 'CO' + String(CO)); //enviar datos en una cadena
+    Trans.println('T'+ String(t)+'H'+ String(h) + 'C' + String(c) + 'E' + String(e)); //enviar datos en una cadena
 }
