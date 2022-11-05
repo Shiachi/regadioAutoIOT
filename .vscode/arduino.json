@@ -1,5 +1,5 @@
 {
-    "port": "COM4",
+    "port": "COM3",
     "board": "arduino:avr:uno",
-    "sketch": "ProyectoFinal\\ArduinoUno\\ArduinoUno.ino"
+    "sketch": "ComponentTest\\MQ135 devCris\\ArduinoUno\\ArduinoUno.ino"
 }
