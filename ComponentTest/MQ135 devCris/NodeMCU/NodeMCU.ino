@@ -1,6 +1,10 @@
 #include <SoftwareSerial.h>
 #include <ESP8266WiFi.h>
 
+//antes se deben configurar los parametros: placa, com
+//Visual estudio compilar ctr + shift + P -> upload
+
+
 SoftwareSerial mySerial(13, 15); // RX, TX
 // longitud del buffer
 const int lonbuffer = 10;
