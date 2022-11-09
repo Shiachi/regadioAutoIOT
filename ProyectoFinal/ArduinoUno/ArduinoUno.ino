@@ -1,80 +1,111 @@
+//Incluir librerias
+#include "DHT.h"  
 #include <SoftwareSerial.h>
-#include "DHT.h"
-
-//definir uso de pines digitales
-#define DHTPin 13     //Pin dth
-#define RelePin 12    //Pin rele
-#define rxPin 2 
-#define txPin 3 
-//definir uso de sensores analogicos
-int MQ7Pin = A5; //Sensor MQ7
-int HumPin = A4; //Sensor humedad tierra
-int MQ135Pin = A3; //Sensor MQ135
 
 
-#define DHTTYPE DHT22   // Sensor DHT22
+//definir pines y tipo de sensores
+#define DHTPin 13 
+#define RELE 12
+#define rxPin 2       
+#define txPin 3 //salida
+#define DHTTYPE DHT22
 
 DHT dht(DHTPin, DHTTYPE);
-//Declarar variables 
-float h,t;
-int ht, CO2, CO;
- 
 SoftwareSerial Trans(rxPin, txPin);               //Pines para Rx y Tx.
 
-void setup()
-{
-  pinMode (txPin , OUTPUT);
-  Serial.begin(9600);
-  Trans.begin(9600);                            //Velocidad de envío para la transmisión al NodeMCU.
-  dht.begin();
-}
+//definicion de pines con valores  para ocupar en logica
+float SensorMQ135 = A3;
+int SensorHum = A4;
+float SensorMQ7 = A5;
 
-void loop()
-{
-  
-    delay(2000);                                  
-    h = dht.readHumidity();                      //Leemos humedad y temperatura respectivamente.
-    t = dht.readTemperature();
-    ht = analogRead(A4);    //Leer humedad de tierra
-    CO2 = analogRead(A3);   //leer CO2
-    CO = analogRead(A5);    //leer CO
-    if (isnan(h) || isnan(t))                         //Si no se lee valor numérico indicamos el fallo y volvemos a 
-                                                              //comprobar.
+//declarar variables para logica
+const int ONF = 1000;    //Tiempo encendido
+float a, c, t, h; //   a=MQ135 //c=MQ7 //t=Dht22 temperatura //h=dht22 humedad
+int b; //b=Humedad de tierra
+
+
+void setup(){
+    Serial.begin(9600);
+    pinMode(RELE, OUTPUT);//Define el pin RELE como salida
+    digitalWrite(RELE, HIGH);//Rele inicia apagado
+
+    Trans.begin(9600);
+    dht.begin();
+    a,b,c,t,h = 0;
+
+}
+void loop(){
+    delay(2000);   
+
+    a = analogRead(SensorMQ135); //lectura de la humedad de la tierra
+    b = analogRead(SensorHum);
+    c = analogRead(SensorMQ7);
+
+    t = dht.readTemperature(); //Leer temperatura en grados celcius dht22
+    h = dht.readHumidity(); //leer humedad dht22
+
+    //Revisar sensor humedad y temperatura DHT22 revisa  que no este vacio e imprime datos
+    if (isnan(h) || isnan(t))                                                                 
     {
       Serial.println("Failed to read from DHT sensor!");
-      return;
-    }
-    else if (isnan(ht))
+    }else
     {
-        Serial.println("Failed to read from Earth sensor!");
-      return;
+      Serial.println("Uno");
+      Serial.print("Temperatura: ");
+      Serial.print(t);
+      Serial.println(" *C ");
+      Serial.print("Humedad: ");
+      Serial.print(h);
+      Serial.println(" %");
     }
-    else if (isnan(CO2))
+    //Revisa sensor de humedad de la tierra revisa  que no este vacio e imprime datos
+    if (isnan(b))
     {
-        Serial.println("Failed to read from MQ135 sensor!");
-      return;
+      Serial.println("Failed to read from Earth sensor!");
     }
-    else if (isnan(CO))
+    else
     {
-        Serial.println("Failed to read from MQ7 sensor!");
-      return;
+      Serial.print("Humedad de la tierra: ");
+      Serial.print(b);
+      Serial.println(" %");
     }
-    
 
+    //Revisa sensor MQ7 encargador de analizar CO revisa  que no este vacio e imprime datos
+    if (isnan(c))
+    {
+      Serial.println("Failed to read from MQ7 sensor!");
+    }
+    else
+    {
+      Serial.print("CO: ");
+      Serial.println(c);
+    }
+    //lectura de MQ135
+    if (isnan(a))
+    {
+      Serial.println("Failed to read from MQ135 sensor!");
+    }
+    else
+    {
+      Serial.print("calidad de aire: ");
+      Serial.println(a);
+    }
 
-    Trans.println('T'+ String(t)+'H'+ String(h) + 'CO' + String(CO) + 'CO2' String(CO2) + 'Humedad tierra' + String(ht)); //enviar datos en una cadena
-
-    /*
-    Serial.print("Temperatura: ");
-    Serial.print(t);
-    Serial.print(" *C ");
-    Serial.print("Humedad: ");
-    Serial.print(h);
-    Serial.print(" %\t");
     Serial.print(" \n");
+
+    Trans.println('A'+ String(a)+'E'+ String(b) + 'C' + String(c) + 'H' + String(h) + 'T' + String(t)); 
+    //A = calidad del aire  // E = Humedad de la tierra // C = CO   // H = Humedad ambiente // T = Temperatura ambiente
+
+    /*Logica de riego desactivada para que no se active
+    if (humedad <  500){
+        digitalWrite(RELE, LOW);//Enciende el rele
+        delay(ONF);//Espera el tiempo de llenado 
+        digitalWrite(RELE, HIGH);//Apaga el rele
+    }
+    else
+    {
+        digitalWrite(RELE, HIGH);//Apaga el rele
+        delay(ONF);
+    }
     */
-    
-    
-                        
-                                                           
 }
