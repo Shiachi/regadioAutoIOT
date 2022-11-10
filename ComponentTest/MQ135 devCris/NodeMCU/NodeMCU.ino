@@ -37,8 +37,6 @@ void loop()
      
     mySerial.readBytesUntil('H', buffer, lonbuffer);
     hum = mySerial.parseFloat();
-
-    //delay(500);
     
     mySerial.readBytesUntil('C', buffer, lonbuffer);
     MoCa = mySerial.parseInt();
