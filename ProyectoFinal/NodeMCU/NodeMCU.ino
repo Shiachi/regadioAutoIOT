@@ -23,10 +23,9 @@ float humA, temA;
 int CO, CO2, humT; 
 // CO = Monóxido de carbono (MQ7)    //CO2 = Dióxido de carbono (MQ135) //humT humedad de tierra
 
-//Conexion a internet y mqtt
-const char *ssid = "Kira";
-const char *password = "652-CoAt-76";
-const char* mqtt_server = "68.183.119.177"; // Este es el address en mqtt dash
+
+
+
 const char* keyDevice = "";
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -37,12 +36,6 @@ bool conexion = false;
 bool enviar = false;
 // RIOTL = Sistema de regadio automatico (activado por defecto)
 bool RIOTL = true;
-
-//Id de contacto
-#define CHAT_ID "1065469951"
-
-// ID de bot de telegram
-#define BOTtoken "5804652166:AAFfRRmba72V4iaZ6B77mfx-9UN29Ia_Dyc"
 
 //iniciar cliente seguro
 X509List cert(TELEGRAM_CERTIFICATE_ROOT);
@@ -272,10 +265,3 @@ void loop()
         delay(1000);
     }
 }
-
-
-
-$ git config --global user.name "Shiachi"
-$ git config --global user.email w.leroy@alumnos.santotomas.cl
-
-
