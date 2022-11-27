@@ -25,7 +25,7 @@ const char* password = "652-CoAt-76";
 #define CHAT_ID "1065469951"
 
 // Initialize Telegram BOT
-#define BOTtoken "5804652166:AAFfRRmba72V4iaZ6B77mfx-9UN29Ia_Dyc"  // your Bot Token (Get from Botfather)
+#define BOTtoken "5804652166:AAEG3bdPwIZlUhwQWfAHqJ9TbTIfmSH3THY"  // your Bot Token (Get from Botfather)
 
 #define DHTPIN 14
 #define DHTTYPE DHT22
