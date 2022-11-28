@@ -15,14 +15,14 @@ int delayTime = 2000;
 
 SoftwareSerial mySerial(13, 15); // RX, TX
 // longitud del buffer
-const int lonbuffer = 1000;
+const int lonbuffer = 500;
 // buffer para almacenar el comando
 char buffer[lonbuffer];
 
 //Declarar variables int horaUsuario;
-float humA, temA;
+float humA, temA, humAT, temAT ;  //humAT, tempT variables de prueba
 //humA = humedad ambiental (dht22)    //temA = temperatura ambiental (dht22)
-int CO, CO2, humT, horaUsuario; 
+int CO, CO2, humT, horaUsuario, COT, CO2T, humTT;   //COT, CO2T, humTT variables de prueba
 // CO = Monóxido de carbono (MQ7)    //CO2 = Dióxido de carbono (MQ135) //humT humedad de tierra
 
 //Iniciar conexion con bot de telegram 
@@ -146,19 +146,57 @@ String obtenerValores(){
   if (mySerial.available() > 0)
   {
     mySerial.readBytesUntil('A', buffer, lonbuffer);
-    CO2 = mySerial.parseInt();
+    CO2T = mySerial.parseInt();
+    if(CO2T == 1){
+      CO2 = CO2;
+    }
+    else if (CO2T > 1)
+    {
+      CO2 = CO2T;
+    }
      
     mySerial.readBytesUntil('E', buffer, lonbuffer);
-    humT = mySerial.parseInt();
+    humTT = mySerial.parseInt();
+    if(humTT == 1){
+      humT = humT;
+    }
+    else if (humTT > 1)
+    {
+      humT = humTT;
+    }
     
     mySerial.readBytesUntil('C', buffer, lonbuffer);
-    CO = mySerial.parseInt();
+    COT = mySerial.parseInt();
+    if(COT == 1){
+      CO = CO;
+    }
+    else if (COT > 1)
+    {
+      CO = COT;
+    }
 
     mySerial.readBytesUntil('H', buffer, lonbuffer);
-    humA = mySerial.parseFloat();
+    humAT = mySerial.parseFloat();
+    if(humAT == 1){
+      humA = humA;
+    }
+    else if (humAT > 1)
+    {
+      humA = humAT;
+    }
 
     mySerial.readBytesUntil('T', buffer, lonbuffer);
-    temA = mySerial.parseFloat();
+    temAT = mySerial.parseFloat();
+    if(temAT == 1){
+      temA = temA;
+    }
+    else if (temAT > 1)
+    {
+      temA = temAT;
+    }
+    else{
+      Serial.println("error de lecutra");
+    }
 
     conexion = true;
     enviar = true;
@@ -205,8 +243,8 @@ String obtenerValores(){
 }
 void setup() 
 {
-  Serial.begin(9600);
-  mySerial.begin(9600);
+  Serial.begin(115200);
+  mySerial.begin(115200);
   Serial.println("Iniciando.");
   setup_wifi();
   // Configuracion del mqtt
@@ -254,7 +292,6 @@ void logicaRegadio()
 }
 void loop()
 {
-    delay(delayTime);
     obtenerValores();
     logicaRegadio();
     //Si cliente esta desconectado activar funcion reconectar
