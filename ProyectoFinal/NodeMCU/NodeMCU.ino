@@ -22,7 +22,8 @@ char buffer[lonbuffer];
 //Declarar variables int horaUsuario;
 float humA, temA, humAT, temAT ;  //humAT, tempT variables de prueba
 //humA = humedad ambiental (dht22)    //temA = temperatura ambiental (dht22)
-int CO, CO2, humT, horaUsuario, COT, CO2T, humTT;   //COT, CO2T, humTT variables de prueba
+int CO, CO2, humT, COT, CO2T, humTT;   //COT, CO2T, humTT variables de prueba
+int  horaUsuario, diaUsuario;
 // CO = Monóxido de carbono (MQ7)    //CO2 = Dióxido de carbono (MQ135) //humT humedad de tierra
 
 //Iniciar conexion con bot de telegram 
@@ -52,7 +53,7 @@ X509List cert(TELEGRAM_CERTIFICATE_ROOT);
 WiFiClientSecure clientSecure;
 UniversalTelegramBot bot(BOTtoken, clientSecure);
 int botRequestDelay = 1000;
-unsigned long lastTimeBotRan;
+unsigned long lastTimeBotRan; 
 
 //configurar conexion a internet y mqqt
 void setup_wifi() {
@@ -81,10 +82,10 @@ void callback(char* topic, byte* payload, unsigned int length)
   }
   else if(topico=="RIOT/02")
   {
-      if (((char)payload[0] == '0')) { // 0 para prender (activada por defecto)
+      if (((char)payload[0] == '1')) { // 0 para prender (activada por defecto)
         RIOTL = true;
         Serial.println("Sistema de riego automatizado apagado");
-    } else if (((char)payload[0] == '1')) { // 1 para apagar
+    } else if (((char)payload[0] == '0')) { // 1 para apagar
         RIOTL = false;
         Serial.println("Sistema de riego automatizado encendido");}
   }
@@ -99,7 +100,17 @@ void callback(char* topic, byte* payload, unsigned int length)
     horaUsuario = content.toInt();
     Serial.println(horaUsuario);
   }
+  if(topico=="RIOT/BTD")
+  {
 
+    String content = "";   
+    for (size_t i = 0; i < length; i++)   
+    {
+      content.concat((char)payload[i]);
+    }
+    diaUsuario = content.toInt();
+    Serial.println(diaUsuario);
+  }
   
 }
 //Reconeccion y subscripcion de botones
@@ -110,14 +121,15 @@ void reconnect()
       Serial.println("connected");
       client.subscribe("RIOT/01"); // Topico al momento de crear el boton
       client.subscribe("RIOT/02"); // Topico al momento de crear el boton
-      client.subscribe("RIOT/BT");
+      client.subscribe("RIOT/BT");  //hora
+      client.subscribe("RIOT/BTD"); //dia
+      
     } else {
       delay(delayTime);
     }
   }
 }
-void handleNewMessages(int numNewMessages) 
-{
+void handleNewMessages(int numNewMessages) {
   Serial.println("handleNewMessages");
   Serial.println(String(numNewMessages));
 
@@ -125,7 +137,7 @@ void handleNewMessages(int numNewMessages)
     // Chat id of the requester
     String chat_id = String(bot.messages[i].chat_id);
     if (chat_id != CHAT_ID){
-      bot.sendMessage(chat_id, "Unauthorized user", "");  //Autentificar usuario a traves de su id
+      bot.sendMessage(chat_id, "Unauthorized user", "");
       continue;
     }
     
@@ -134,8 +146,15 @@ void handleNewMessages(int numNewMessages)
     Serial.println(text);
 
     String from_name = bot.messages[i].from_name;
-    //zona de comandos
-    if (text == "/readings") {  //Comando para obtener lecturas de los sensores
+
+    if (text == "/start") {
+      String welcome = "Welcome, " + from_name + ".\n";
+      welcome += "Use the following command to get current readings.\n\n";
+      welcome += "/readings \n";
+      bot.sendMessage(chat_id, welcome, "");
+    }
+
+    if (text == "/readings") {
       String readings = obtenerValores();
       bot.sendMessage(chat_id, readings, "");
     }  
@@ -227,7 +246,6 @@ String obtenerValores(){
     return message;
     Serial.print(" \n");
     enviar = false;
-    delay(delayTime);
     //Cambiar enviar a "false" y agregar un delay para sincronizar los datos recibidos con los que envía el Arduino.
   }
   //Si la conexion falla imprimir error y desactivar sistema inteligente
@@ -237,14 +255,14 @@ String obtenerValores(){
     conexion = false;
     RIOTL = false;
     return message;
-    delay(delayTime);
   }
 
 }
 void setup() 
 {
-  Serial.begin(115200);
-  mySerial.begin(115200);
+  
+  Serial.begin(9600);
+  mySerial.begin(9600);
   Serial.println("Iniciando.");
   setup_wifi();
   // Configuracion del mqtt
@@ -252,6 +270,7 @@ void setup()
   client.setCallback(callback);  
   // Agregar certificado obtenido del api de telegram
   clientSecure.setTrustAnchors(&cert); 
+  configTime(0, 0, "pool.ntp.org");
   //definir uso de pines
   pinMode(Rele, OUTPUT);//Define el pin RELE como salida
   digitalWrite(Rele, LOW);//Rele inicia apagado
@@ -266,9 +285,16 @@ void logicaRegadio()
 {
   timeClient.update();
   int cH = timeClient.getHours();
+  client.publish("RIOT/GH",String(cH).c_str());
+  int cD = timeClient.getDay();
+  client.publish("RIOT/GD",String(cD).c_str());
+
    Serial.println(cH);
+
+   Serial.println(cD);
+
    
-    if(RIOTL == true && conexion == true && cH == horaUsuario)
+    if(RIOTL == true && conexion == true && cH == horaUsuario && cD == diaUsuario)
     {
         Serial.println("Sistema de riego automatizado encendido");
     if (humT >  500){
@@ -276,6 +302,8 @@ void logicaRegadio()
         digitalWrite(Rele, HIGH);//Enciende el rele
         delay(delayTime);
         digitalWrite(Rele, LOW);//Apaga el rele
+        int vbaa = 1;
+        client.publish("RIOT/BAA",String(vbaa).c_str());
     }
     else
     {
@@ -287,19 +315,20 @@ void logicaRegadio()
         Serial.print(RIOTL);
         Serial.print(conexion);
         Serial.println("Sistema de riego automatizado apagado");
-        delay(delayTime);
     }
 }
 void loop()
 {
-    obtenerValores();
-    logicaRegadio();
     //Si cliente esta desconectado activar funcion reconectar
     if (!client.connected())
     {
       reconnect();
     }
     client.loop();
+    
+    obtenerValores();
+    logicaRegadio();
+    
     if (millis() > lastTimeBotRan + botRequestDelay)  {
     int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
 
@@ -310,4 +339,5 @@ void loop()
     }
     lastTimeBotRan = millis();
   }
+  delay(delayTime);
 }

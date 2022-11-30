@@ -39,6 +39,10 @@ void loop() {
   Serial.print("Minutes: ");
   Serial.println(currentMinute); 
 
+  int currentDay = timeClient.getDay();
+  Serial.print("Minutes: ");
+  Serial.println(currentDay); 
+
   Serial.println("");
 
   delay(2000);
