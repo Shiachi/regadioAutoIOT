@@ -23,8 +23,8 @@
 
 
   void setup(){
-      Serial.begin(115200);
-      Trans.begin(115200);
+      Serial.begin(9600);
+      Trans.begin(9600);
       dht.begin();
       a,b,c,t,h = 0;
 
