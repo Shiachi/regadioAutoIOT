@@ -30,11 +30,11 @@ int  horaUsuario, diaUsuario;
 #define BOTtoken "5804652166:AAEG3bdPwIZlUhwQWfAHqJ9TbTIfmSH3THY"  // your Bot Token (Get from Botfather)
 
 //ID a la cual el bot enviara un mensaje
-#define CHAT_ID "1065469951"
+#define CHAT_ID "-613616475"
 
 //Conexion con internet
-const char *ssid = "Kira";
-const char *password = "652-CoAt-76";
+const char *ssid = "Shiachi";
+const char *password = "357852159654a";
 //Conexion con mqtt server
 const char* mqtt_server = "68.183.119.177"; // Este es el address en mqtt dash
 const char* keyDevice = "";
@@ -171,7 +171,7 @@ String obtenerValores(){
     }
     else if (CO2T > 1)
     {
-      CO2 = CO2T;
+      CO2 = CO2T + 300;
     }
      
     mySerial.readBytesUntil('E', buffer, lonbuffer);
