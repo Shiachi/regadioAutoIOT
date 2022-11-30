@@ -88,6 +88,6 @@
 
       Serial.print(" \n");
 
-      Trans.println('A'+ String(a)+'E'+ String(b).c_str + 'C' + String(c) + 'H' + String(h) + 'T' + String(t)); 
+      Trans.println('A'+ String(a)+'E'+ String(b) + 'C' + String(c) + 'H' + String(h) + 'T' + String(t)); 
       //A = calidad del aire  // E = Humedad de la tierra // C = CO   // H = Humedad ambiente // T = Temperatura ambiente
   }
